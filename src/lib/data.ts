@@ -1,7 +1,7 @@
 export type SocialLink = {
   label: string;
   href: string;
-  iconClass: string;
+  icon: 'linkedin' | 'instagram' | 'whatsapp' | 'email';
 };
 
 export type Profile = {
@@ -50,17 +50,22 @@ export const profile: Profile = {
     {
       label: 'LinkedIn',
       href: 'https://www.linkedin.com/in/nadwyanshary/',
-      iconClass: 'bi bi-linkedin'
+      icon: 'linkedin'
     },
     {
       label: 'Instagram',
       href: 'https://www.instagram.com/bochiers/',
-      iconClass: 'bi bi-instagram'
+      icon: 'instagram'
     },
     {
       label: 'WhatsApp',
       href: 'https://wa.me/+6282111627976',
-      iconClass: 'bi bi-whatsapp'
+      icon: 'whatsapp'
+    },
+    {
+      label: 'Email',
+      href: 'mailto:nadwy@nawasena.net',
+      icon: 'email'
     }
   ]
 };
@@ -148,4 +153,3 @@ export const portfolio: PortfolioItem[] = [
     images: ['/assets/img/Porto/SIT%20AL/Video%20Trion%20Kasal.jpg']
   }
 ];
-

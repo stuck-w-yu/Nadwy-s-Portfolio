@@ -1,4 +1,4 @@
-# Website Profile (Svelte + Tailwind CSS v4)
+# Website Profile (SvelteKit + Tailwind CSS)
 
 Konversi dari website statis (HTML + Bootstrap template) ke **SvelteKit** dengan **Tailwind CSS v4** untuk styling.
 
@@ -13,8 +13,8 @@ Konversi dari website statis (HTML + Bootstrap template) ke **SvelteKit** dengan
 ## Menjalankan (butuh Node.js)
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 ## Catatan
