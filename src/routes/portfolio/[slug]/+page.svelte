@@ -1,18 +1,54 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
   export let data: {
     item: import('$lib/data').PortfolioItem;
   };
 
   const { item } = data;
-  let activeSrc = item.images?.[0] ?? item.image;
+  const images = (item.images?.length ? item.images : [item.image]).filter(Boolean);
+  let index = 0;
+  let isSliding = false;
+  let scrollBlur = 0;
+
+  function clamp(n: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, n));
+  }
+
+  function setIndex(next: number) {
+    const clamped = clamp(next, 0, images.length - 1);
+    if (clamped === index) return;
+    index = clamped;
+    isSliding = true;
+    window.setTimeout(() => (isSliding = false), 260);
+  }
+
+  function prev() {
+    setIndex(index - 1);
+  }
+
+  function next() {
+    setIndex(index + 1);
+  }
+
+  let lastY = 0;
+  let lastT = 0;
+  function onScroll() {
+    const now = performance.now();
+    const y = window.scrollY;
+    const dt = Math.max(16, now - lastT);
+    const v = Math.abs(y - lastY) / dt; // px per ms
+    scrollBlur = clamp(v * 20, 0, 10);
+    lastY = y;
+    lastT = now;
+  }
 </script>
 
 <svelte:head>
   <title>{item.title} — Portfolio</title>
 </svelte:head>
 
-<main class="mx-auto max-w-6xl px-4 py-10">
+<svelte:window on:scroll={onScroll} />
+
+<main class="mx-auto max-w-6xl px-4 py-10" style={`--scroll-blur:${scrollBlur}px`}>
   <a
     href="/#portfolio"
     class="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/20"
@@ -25,7 +61,10 @@
 
   <div class="mt-8 grid gap-8 lg:grid-cols-[1.6fr_1fr]">
     <section class="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5">
-      <div class="pointer-events-none absolute -inset-16 -z-10 opacity-70 blur-3xl">
+      <div
+        class="pointer-events-none absolute -inset-16 -z-10 opacity-70 blur-3xl"
+        style="filter: blur(calc(48px + var(--scroll-blur)));"
+      >
         <div class="futuristic-blob h-full w-full"></div>
       </div>
 
@@ -35,35 +74,80 @@
       <div
         class="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40 shadow-[0_0_0_1px_rgba(255,255,255,.03)]"
       >
-        {#key activeSrc}
-          <img
-            src={activeSrc}
-            alt={item.title}
-            class="aspect-16/11 w-full object-cover will-change-transform motion-safe:animate-[imgIn_.45s_ease-out]"
-            transition:fade={{ duration: 220 }}
-          />
-        {/key}
+        <div class={`relative aspect-16/11 w-full ${isSliding ? 'is-sliding' : ''}`}>
+          <div
+            class="absolute inset-0 flex transition-transform duration-500 ease-out motion-reduce:transition-none"
+            style={`transform: translate3d(${-index * 100}%, 0, 0);`}
+          >
+            {#each images as src (src)}
+              <div class="h-full w-full shrink-0">
+                <img src={src} alt={item.title} class="h-full w-full object-cover" loading="lazy" />
+              </div>
+            {/each}
+          </div>
+
+          <div class="pointer-events-none absolute inset-0 ring-1 ring-white/5"></div>
+
+          {#if images.length > 1}
+            <div class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 p-3">
+              <button
+                type="button"
+                class="pointer-events-auto inline-flex items-center justify-center rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2 text-sm text-slate-100 backdrop-blur hover:bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
+                on:click={prev}
+                disabled={index === 0}
+                aria-label="Previous image"
+              >
+                Prev
+              </button>
+
+              <div class="pointer-events-auto flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/40 px-3 py-1.5 text-xs text-slate-200 backdrop-blur">
+                <span class="tabular-nums">{index + 1}</span>
+                <span class="text-slate-500">/</span>
+                <span class="tabular-nums">{images.length}</span>
+              </div>
+
+              <button
+                type="button"
+                class="pointer-events-auto inline-flex items-center justify-center rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2 text-sm text-slate-100 backdrop-blur hover:bg-slate-950/70 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
+                on:click={next}
+                disabled={index === images.length - 1}
+                aria-label="Next image"
+              >
+                Next
+              </button>
+            </div>
+          {/if}
+        </div>
       </div>
 
-      {#if item.images?.length > 1}
-        <div class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
-          {#each item.images as src (src)}
-            <button
-              type="button"
-              class={`overflow-hidden rounded-xl border ${
-                src === activeSrc ? 'border-white/30' : 'border-white/10 hover:border-white/20'
-              } bg-white/5 transition will-change-transform hover:-translate-y-0.5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 motion-reduce:transform-none`}
-              on:click={() => (activeSrc = src)}
-              aria-label={`View image for ${item.title}`}
-            >
-              <img
-                src={src}
-                alt=""
-                class="aspect-4/3 w-full object-cover transition duration-300 hover:scale-[1.03] motion-reduce:transform-none"
-                loading="lazy"
-              />
-            </button>
-          {/each}
+      {#if images.length > 1}
+        <div class="mt-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-medium text-slate-400">Thumbnails</p>
+            <p class="text-xs text-slate-500">Tip: scroll horizontally</p>
+          </div>
+          <div
+            class="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 scrollbar-thin"
+            style="scroll-behavior:smooth"
+          >
+            {#each images as src, i (src)}
+              <button
+                type="button"
+                class={`snap-start overflow-hidden rounded-xl border ${
+                  i === index ? 'border-white/30' : 'border-white/10 hover:border-white/20'
+                } bg-white/5 transition will-change-transform hover:-translate-y-0.5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 motion-reduce:transform-none`}
+                on:click={() => setIndex(i)}
+                aria-label={`View image ${i + 1} for ${item.title}`}
+              >
+                <img
+                  src={src}
+                  alt=""
+                  class="aspect-4/3 w-40 object-cover transition duration-300 hover:scale-[1.03] motion-reduce:transform-none"
+                  loading="lazy"
+                />
+              </button>
+            {/each}
+          </div>
         </div>
       {/if}
     </section>
@@ -113,6 +197,16 @@
     to {
       transform: scale(1);
       filter: saturate(1);
+    }
+  }
+
+  .is-sliding > div {
+    filter: blur(0px);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .is-sliding > div {
+      filter: blur(10px);
     }
   }
 

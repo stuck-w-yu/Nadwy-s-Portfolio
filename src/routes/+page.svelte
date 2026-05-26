@@ -182,12 +182,14 @@
       </div>
 
       <div class="relative">
-        <div class="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-indigo-500/15 via-fuchsia-500/10 to-cyan-400/15 blur-2xl" />
-        <div class="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5">
+        <div
+          class="absolute -inset-6 -z-10 rounded-4xl bg-linear-to-br from-indigo-500/15 via-fuchsia-500/10 to-cyan-400/15 blur-2xl"
+        ></div>
+        <div class="overflow-hidden rounded-4xl border border-white/10 bg-white/5">
           <img
             src="/assets/img/nadwy%20profile.jpg"
             alt={profile.name}
-            class="aspect-[4/5] w-full object-cover"
+            class="aspect-4/5 w-full object-cover"
             loading="eager"
           />
         </div>
@@ -252,7 +254,7 @@
               <p class="text-slate-300">{s.value}%</p>
             </div>
             <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
-              <div class="h-2 rounded-full bg-gradient-to-r from-indigo-400 to-cyan-300" style={`width:${s.value}%`} />
+              <div class="h-2 rounded-full bg-linear-to-r from-indigo-400 to-cyan-300" style={`width:${s.value}%`}></div>
             </div>
           </div>
         {/each}
@@ -319,7 +321,7 @@
             href={`/portfolio/${item.slug}`}
             class="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
           >
-            <div class="aspect-[16/11] w-full overflow-hidden bg-white/5">
+            <div class="aspect-16/11 w-full overflow-hidden bg-white/5">
               <img
                 src={item.image}
                 alt={item.title}
@@ -423,7 +425,7 @@
             required
             class="mt-2 w-full resize-none rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20"
             placeholder="Write your message…"
-          />
+          ></textarea>
         </label>
 
         <div class="mt-5 flex items-center justify-between gap-3">
@@ -438,7 +440,7 @@
       </form>
 
       <footer class="py-14 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} {profile.name}. Built with SvelteKit + Tailwind.
+        © {new Date().getFullYear()} {profile.name}.
       </footer>
     </section>
   </main>
